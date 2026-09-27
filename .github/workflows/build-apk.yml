@@ -24,8 +24,8 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android SDK 35
-        run: yes | sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install Android SDK
+        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -33,16 +33,20 @@ jobs:
           gradle-version: '8.11.1'
 
       - name: Build Release APK
-        run: gradle --no-daemon assembleRelease
+        run: gradle --no-daemon --stacktrace assembleRelease
+
+      - name: Rename APK
+        run: cp app/build/outputs/apk/release/app-release.apk flappy-bird.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: flappy-bird-apk
-          path: app/build/outputs/apk/release/app-release.apk
+          path: flappy-bird.apk
           if-no-files-found: error
+          retention-days: 30
 
-      - name: Build Summary
+      - name: Build summary
         run: |
-          echo "## APK ready" >> "$GITHUB_STEP_SUMMARY"
+          echo "## APK آماده است" >> "$GITHUB_STEP_SUMMARY"
           echo "Artifact: flappy-bird-apk" >> "$GITHUB_STEP_SUMMARY"
