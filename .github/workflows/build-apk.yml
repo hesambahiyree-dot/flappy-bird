@@ -11,6 +11,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,16 +23,25 @@ jobs:
           java-version: '17'
 
       - name: Prepare Android SDK
+        shell: bash
         run: |
-          export ANDROID_HOME="$ANDROID_SDK_ROOT"
+          set -euo pipefail
+          export ANDROID_HOME="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}"
           export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+
           yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager --install             "platform-tools"             "platforms;android-35"             "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
+
+      - name: Validate Gradle project
+        run: gradle --no-daemon --version
 
       - name: Build Release APK
         run: gradle --no-daemon --stacktrace assembleRelease
@@ -49,5 +59,9 @@ jobs:
 
       - name: Build summary
         run: |
-          echo "## APK آماده است" >> "$GITHUB_STEP_SUMMARY"
-          echo "Artifact: flappy-bird-apk" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## Flappy Bird APK"
+            echo ""
+            echo "Build completed successfully."
+            echo "Artifact: flappy-bird-apk"
+          } >> "$GITHUB_STEP_SUMMARY"
