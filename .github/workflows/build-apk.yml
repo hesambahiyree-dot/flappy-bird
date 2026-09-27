@@ -33,7 +33,10 @@ jobs:
           echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
 
           yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager --install             "platform-tools"             "platforms;android-35"             "build-tools;35.0.0"
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -46,8 +49,37 @@ jobs:
       - name: Build Release APK
         run: gradle --no-daemon --stacktrace assembleRelease
 
-      - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk flappy-bird.apk
+      - name: Sign Release APK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APK_UNSIGNED="$(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)"
+          if [ -z "$APK_UNSIGNED" ]; then
+            echo "No release APK was produced."
+            find app/build/outputs -type f -maxdepth 5 -print || true
+            exit 1
+          fi
+
+          keytool -genkeypair \
+            -keystore flappy-release.keystore \
+            -storepass changeit \
+            -keypass changeit \
+            -alias flappy \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Flappy Bird,O=Hesam,C=XX"
+
+          apksigner sign \
+            --ks flappy-release.keystore \
+            --ks-pass pass:changeit \
+            --key-pass pass:changeit \
+            --out flappy-bird.apk \
+            "$APK_UNSIGNED"
+
+          apksigner verify --verbose flappy-bird.apk
+          rm -f flappy-release.keystore
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -62,6 +94,6 @@ jobs:
           {
             echo "## Flappy Bird APK"
             echo ""
-            echo "Build completed successfully."
+            echo "Release APK built and signed successfully."
             echo "Artifact: flappy-bird-apk"
           } >> "$GITHUB_STEP_SUMMARY"
