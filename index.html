@@ -1,74 +1,15 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#4a2c4a">
-<meta name="mobile-web-app-capable" content="yes">
-<title>بالن غروب</title>
-<link rel="icon" href="design/app-icon/icon_1024_transparent.png">
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#4a2c4a"><meta name="mobile-web-app-capable" content="yes">
+<title>بالن غروب</title><link rel="icon" href="design/app-icon/icon_1024_transparent.png"><link rel="stylesheet" href="style.css">
 </head>
-<body>
-<main id="app">
-  <canvas id="game" aria-label="بازی بالن غروب"></canvas>
-
-  <section id="menu" class="screen">
-    <div class="menu-card">
-      <div class="mini-balloon" aria-hidden="true">◒</div>
-      <h1>بالن غروب</h1>
-      <p>یک پرواز آرام در میان غروب</p>
-      <button id="play" class="primary">بازی</button>
-      <button id="settings" class="secondary">تنظیمات</button>
-      <button id="help" class="secondary">راهنما</button>
-    </div>
-  </section>
-
-  <section id="settingsScreen" class="screen hidden">
-    <div class="panel">
-      <h2>تنظیمات</h2>
-      <label class="setting-row"><span>صدا</span><button id="soundToggle" class="toggle on">روشن</button></label>
-      <label class="setting-row"><span>حساسیت حرکت</span><input id="sensitivity" type="range" min="1" max="5" value="3"></label>
-      <button id="settingsBack" class="secondary">بازگشت</button>
-    </div>
-  </section>
-
-  <section id="helpScreen" class="screen hidden">
-    <div class="panel">
-      <h2>راهنما</h2>
-      <div class="help-text">
-        <p>👆 هر بار که ضربه می‌زنی، شکاف به‌نرمی جهتش را عوض می‌کند.</p>
-        <p>🎈 بالون را از شکاف لوله‌ها عبور بده.</p>
-        <p>🏆 هر عبور موفق یک امتیاز دارد.</p>
-        <p>💥 برخورد با لوله یعنی پایان بازی.</p>
-      </div>
-      <button id="helpBack" class="secondary">بازگشت</button>
-    </div>
-  </section>
-
-  <section id="hud" class="hidden">
-    <span id="score">0</span>
-    <button id="pause" aria-label="مکث">Ⅱ</button>
-  </section>
-
-  <section id="pauseScreen" class="screen hidden">
-    <div class="panel compact">
-      <h2>بازی متوقف شد</h2>
-      <button id="resume" class="primary">ادامه</button>
-      <button id="pauseHome" class="secondary">منو</button>
-    </div>
-  </section>
-
-  <section id="gameover" class="screen hidden">
-    <div class="panel compact">
-      <h2>پایان پرواز</h2>
-      <div class="result-label">امتیاز شما</div>
-      <div id="finalScore" class="final-score">0</div>
-      <button id="restart" class="primary">دوباره بازی کن</button>
-      <button id="home" class="secondary">منو</button>
-    </div>
-  </section>
-</main>
-<script src="script.js"></script>
-</body>
-</html>
+<body><main id="app"><canvas id="game" aria-label="بازی بالن غروب"></canvas>
+<section id="menu" class="screen"><div class="menu-card"><div class="mini-balloon">◒</div><h1>بالن غروب</h1><p>یک پرواز آرام در میان غروب</p><button id="play" class="primary">بازی</button><button id="settings" class="secondary">تنظیمات</button><button id="help" class="secondary">راهنما</button></div></section>
+<section id="settingsScreen" class="screen hidden"><div class="panel"><h2>تنظیمات</h2><label class="setting-row"><span>صدا</span><button id="soundToggle" class="toggle on">روشن</button></label><label class="setting-row"><span>حساسیت حرکت</span><input id="sensitivity" type="range" min="1" max="5" value="3"></label><button id="settingsBack" class="secondary">بازگشت</button></div></section>
+<section id="helpScreen" class="screen hidden"><div class="panel"><h2>راهنما</h2><div class="help-text"><p>👆 هر ضربه جهت حرکت شکاف را عوض می‌کند.</p><p>🎈 بالون را از شکاف لوله‌ها عبور بده.</p><p>🏆 هر عبور موفق یک امتیاز دارد.</p><p>💥 برخورد با لوله یعنی پایان بازی.</p></div><button id="helpBack" class="secondary">بازگشت</button></div></section>
+<section id="hud" class="hidden"><span id="score">0</span><button id="pause" aria-label="مکث">Ⅱ</button></section>
+<section id="pauseScreen" class="screen hidden"><div class="panel compact"><h2>بازی متوقف شد</h2><button id="resume" class="primary">ادامه</button><button id="pauseHome" class="secondary">منو</button></div></section>
+<section id="gameover" class="screen hidden"><div class="panel compact"><h2>پایان پرواز</h2><div class="result-label">امتیاز شما</div><div id="finalScore" class="final-score">0</div><button id="restart" class="primary">دوباره بازی کن</button><button id="home" class="secondary">منو</button></div></section>
+</main><script src="script.js"></script></body></html>
