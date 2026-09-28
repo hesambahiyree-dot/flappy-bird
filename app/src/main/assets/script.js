@@ -20,37 +20,15 @@ balloonSprite.src = 'assets/balloon-exact.png';
 sunsetBg.src = 'assets/sunset-game.jpg';
 
 function prepareBalloonSprite(){
+  // PNG now contains real alpha transparency, so do not color-key it.
   const c=document.createElement('canvas');
-  c.width=balloonSprite.naturalWidth; c.height=balloonSprite.naturalHeight;
-  const x=c.getContext('2d',{willReadFrequently:true});
+  c.width=balloonSprite.naturalWidth;
+  c.height=balloonSprite.naturalHeight;
+  const x=c.getContext('2d');
+  x.imageSmoothingEnabled=true;
   x.drawImage(balloonSprite,0,0);
-  const im=x.getImageData(0,0,c.width,c.height), d=im.data;
-  const seen=new Uint8Array(c.width*c.height), q=[];
-  const seed=[[0,0],[c.width-1,0],[0,c.height-1],[c.width-1,c.height-1]];
-  const bg=[];
-  for(const [sx,sy] of seed){const i=(sy*c.width+sx)*4;bg.push([d[i],d[i+1],d[i+2]]);}
-  const avg=bg.reduce((a,v)=>[a[0]+v[0]/4,a[1]+v[1]/4,a[2]+v[2]/4],[0,0,0]);
-  const tol=48;
-  const ok=(i)=>{
-    const dr=d[i]-avg[0],dg=d[i+1]-avg[1],db=d[i+2]-avg[2];
-    return Math.sqrt(dr*dr+dg*dg+db*db)<tol;
-  };
-  for(const [sx,sy] of seed){
-    const si=sy*c.width+sx;if(seen[si])continue;
-    seen[si]=1;q.push(si);
-  }
-  while(q.length){
-    const p=q.pop(), px=p%c.width, py=(p/c.width)|0, i=p*4;
-    if(ok(i)) d[i+3]=0; else continue;
-    if(px>0){const n=p-1;if(!seen[n]){seen[n]=1;q.push(n)}}
-    if(px<c.width-1){const n=p+1;if(!seen[n]){seen[n]=1;q.push(n)}}
-    if(py>0){const n=p-c.width;if(!seen[n]){seen[n]=1;q.push(n)}}
-    if(py<c.height-1){const n=p+c.width;if(!seen[n]){seen[n]=1;q.push(n)}}
-  }
-  x.putImageData(im,0,0);
   balloonRender=c;
 }
-
 const screens = {
   home: document.getElementById('home'),
   settings: document.getElementById('settings'),
