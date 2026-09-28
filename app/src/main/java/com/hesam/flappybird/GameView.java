@@ -36,6 +36,9 @@ public class GameView extends View {
             this.x = x; this.centerY = centerY; this.gap = gap;
             this.phase = phase; this.speed = speed;
         }
+        Gate(float x, float centerY, float gap) {
+            this(x, centerY, gap, 0f, 0f);
+        }
     }
 
     public GameView(Context c) {
