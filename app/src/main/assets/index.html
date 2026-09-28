@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#4A2C4A">
+  <title>بالن غروب</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <section id="home" class="screen">
+    <div class="tag">ARCADE • SUNSET</div>
+    <h1 class="title">بالن غروب</h1>
+    <div class="subtitle">شکاف را تنظیم کن، از غروب عبور کن.</div>
+    <div class="panel">
+      <button class="btn accent" id="playBtn">بازی</button>
+      <button class="btn secondary" id="settingsBtn">تنظیمات</button>
+      <button class="btn secondary" id="helpBtn">راهنما</button>
+    </div>
+  </section>
+
+  <section id="settings" class="screen hidden">
+    <button class="topBack" data-back>بازگشت</button>
+    <div class="panel">
+      <h2 style="color:#fff;margin-top:0">تنظیمات</h2>
+      <div class="setting-row">
+        <div class="setting-title">حالت کنترل</div>
+        <div class="choices">
+          <button class="choice" data-mode="tap">تپ</button>
+          <button class="choice" data-mode="swipe">اسکرول</button>
+          <button class="choice" data-mode="hybrid">ترکیبی</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-title">حساسیت اسکرول: <span id="sensValue">100%</span></div>
+        <input id="sensitivity" type="range" min="50" max="160" value="100">
+      </div>
+      <label class="check"><span>صدا و افکت</span><input id="sound" type="checkbox" checked></label>
+      <button class="btn secondary" data-back>ذخیره و بازگشت</button>
+    </div>
+  </section>
+
+  <section id="help" class="screen hidden">
+    <button class="topBack" data-back>بازگشت</button>
+    <div class="panel">
+      <h2 style="color:#fff;margin-top:0">راهنما</h2>
+      <p class="small">هدف این است که شکاف هر ستون را دقیقاً مقابل بالن قرار بدهی. ستون‌ها خودشان از راست به چپ حرکت می‌کنند و تو فقط ارتفاع شکاف را تنظیم می‌کنی.</p>
+      <p class="small"><b>تپ:</b> روی صفحه بزن تا ستون هدف به‌صورت نرم ۲۰ پیکسل جابه‌جا شود.</p>
+      <p class="small"><b>اسکرول:</b> انگشت را بالا/پایین بکش؛ ستون هدف همان مقدار حرکت می‌کند.</p>
+      <p class="small"><b>ترکیبی:</b> هر دو روش فعال است.</p>
+      <p class="small"><b>از امتیاز ۵:</b> پنکه‌ها وارد بازی می‌شوند و باد، بالن را بالا یا پایین می‌برد.</p>
+      <button class="btn secondary" data-back>فهمیدم</button>
+    </div>
+  </section>
+
+  <section id="gameUI" class="hidden">
+    <div id="score">0</div>
+    <button id="pauseBtn" aria-label="مکث">Ⅱ</button>
+    <div id="hint">شکاف را با تپ یا اسکرول تنظیم کن</div>
+    <div id="bannerAd">جایگاه تبلیغ بنری</div>
+  </section>
+
+  <div id="pauseOverlay" class="hidden">
+    <div class="pauseCard">
+      <h2>بازی متوقف است</h2>
+      <button class="btn accent" id="resumeBtn">ادامه</button>
+      <button class="btn secondary" id="quitBtn">خروج</button>
+    </div>
+  </div>
+
+  <section id="gameOver" class="screen hidden">
+    <div class="panel" style="text-align:center">
+      <div class="tag">SUNSET RUN</div>
+      <h2 style="color:#fff;font-size:30px;margin:5px 0">پایان بازی</h2>
+      <div class="small">امتیاز نهایی</div>
+      <div class="result-score" id="finalScore">0</div>
+      <button class="btn accent" id="restartBtn">شروع مجدد</button>
+      <button class="btn secondary" id="rewardBtn">تماشای تبلیغ برای ادامه</button>
+      <div class="small" id="rewardInfo">یک سپر برای ادامه یا ۵ ثانیه زمان اضافه</div>
+    </div>
+  </section>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
