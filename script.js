@@ -11,7 +11,7 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const app = document.getElementById('app');
 const balloonSprite = new Image();
-balloonSprite.src = 'assets/balloon.svg';
+balloonSprite.src = 'assets/balloon-reference.svg';
 
 const screens = {
   home: document.getElementById('home'),
@@ -40,7 +40,7 @@ const state = {
 };
 
 let W = 360, H = 640, dpr = 1;
-let balloon, pillars = [], particles = [], windLines = [];
+let balloon, pillars = [], particles = [];
 
 class Balloon {
   constructor(){
@@ -330,14 +330,6 @@ function update(dt){
   }
   particles=particles.filter(q=>q.life>0);
 
-  windLines=[];
-  if(Math.abs(state.wind)>.08){
-    for(let i=0;i<8;i++){
-      windLines.push({x:W*(.46+Math.random()*.5),y:H*(.18+Math.random()*.6),phase:Math.random()*6.28});
-    }
-  }
-}
-
 function draw(){
   drawBackground();
   drawSun();
@@ -348,24 +340,30 @@ function draw(){
 
 function drawBackground(){
   const g=ctx.createLinearGradient(0,0,0,H);
-  const night=state.sunset;
-  g.addColorStop(0, mix('#4A2C4A','#17152f',night*.55));
-  g.addColorStop(.55,mix('#7d3f5c','#2b2740',night*.55));
-  g.addColorStop(1,mix('#D84315','#101a2a',night*.75));
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  // درخشش افق
-  const glow=ctx.createRadialGradient(W*.48,H*.84,5,W*.48,H*.84,W*.72);
-  glow.addColorStop(0,'rgba(255,145,0,.20)');
-  glow.addColorStop(1,'rgba(255,145,0,0)');
-  ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+  g.addColorStop(0,'#4A2C4A');
+  g.addColorStop(.38,'#693553');
+  g.addColorStop(.72,'#a24b4d');
+  g.addColorStop(1,'#D84315');
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,W,H);
+  // نرم‌افزار نور افق، مطابق قاب غروب مرجع
+  const haze=ctx.createLinearGradient(0,H*.58,0,H);
+  haze.addColorStop(0,'rgba(255,112,45,0)');
+  haze.addColorStop(1,'rgba(255,104,28,.10)');
+  ctx.fillStyle=haze;
+  ctx.fillRect(0,H*.55,W,H*.45);
 }
 
 function drawSun(){
-  const y=H*(.80 + state.sunset*.17);
-  const r=Math.min(W*.34,H*.20);
-  const grad=ctx.createRadialGradient(W*.5,y-r*.2,2,W*.5,y,r);
-  grad.addColorStop(0,'#FFE082');grad.addColorStop(.55,'#FFC107');grad.addColorStop(1,'rgba(255,193,7,0)');
-  ctx.fillStyle=grad;ctx.beginPath();ctx.arc(W*.5,y,r,0,Math.PI*2);ctx.fill();
+  const y=H*(.80 + state.sfunction drawSun(){
+  const y=H*(.93 + state.sunset*.055);
+  const r=Math.min(W*.36,H*.205);
+  const grad=ctx.createRadialGradient(W*.5,y-r*.18,4,W*.5,y,r);
+  grad.addColorStop(0,'#FFB300');
+  grad.addColorStop(.72,'#FF9800');
+  grad.addColorStop(1,'rgba(255,152,0,0)');
+  ctx.fillStyle=grad;
+  ctx.beginPath();ctx.arc(W*.5,y,r,0,Math.PI*2);ctx.fill();
 }
 
 function drawPillars(){
@@ -382,18 +380,25 @@ function drawPillars(){
 }
 function drawPillarRect(x,y,w,h,capAtBottom){
   if(h<=0)return;
-  ctx.fillStyle='#5D4037';ctx.strokeStyle='#171313';ctx.lineWidth=5;
-  ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
-  const capH=Math.min(18,h*.08), capW=w+10;
-  const cx=x-5;
+  ctx.fillStyle='#4b2f24';
+  ctx.strokeStyle='#17110e';
+  ctx.lineWidth=5;
+  ctx.fillRect(x,y,w,h);
+  ctx.strokeRect(x,y,w,h);
+  const capH=Math.min(14,Math.max(8,h*.045));
+  const capW=w+7;
+  const cx=x-3.5;
   const cy=capAtBottom ? Math.max(0,h-capH) : y;
-  ctx.fillStyle='#70483a';ctx.fillRect(cx,cy,capW,capH);ctx.strokeRect(cx,cy,capW,capH);
-  ctx.fillStyle='rgba(255,255,255,.07)';ctx.fillRect(x+5,y,Math.max(3,w*.09),h);
+  ctx.fillStyle='#583629';
+  ctx.fillRect(cx,cy,capW,capH);
+  ctx.strokeRect(cx,cy,capW,capH);
+  ctx.fillStyle='rgba(255,205,150,.055)';
+  ctx.fillRect(x+4,y,Math.max(2,w*.08),h);
 }
 
 function drawBalloon(){
   const x=balloon.x,y=balloon.y;
-  const spriteW=Math.min(88,W*.245);
+  const spriteW=Math.min(76,W*.205);
   const naturalRatio = (balloonSprite.naturalHeight || 290) / (balloonSprite.naturalWidth || 180);
   const spriteH = spriteW * naturalRatio;
   ctx.save();
