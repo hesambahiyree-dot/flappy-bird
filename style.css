@@ -39,3 +39,8 @@
     @media (max-height:650px){.title{font-size:42px}.panel{padding:17px}.btn{padding:12px}.screen{padding:18px}}
 
 #gameUI{position:absolute;inset:0;pointer-events:none}#pauseBtn{pointer-events:auto}
+
+.brand-balloon{width:112px;height:190px;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(40,12,8,.28));margin-bottom:4px}
+#hint{bottom:auto;top:27%;left:50%;transform:translateX(-50%);background:transparent;color:#39f47b;padding:0;border-radius:0;font-size:clamp(14px,4.1vw,22px);font-weight:900;letter-spacing:.2px;text-shadow:0 2px 10px rgba(0,0,0,.18)}
+#score{top:28px;left:26px;font-size:clamp(54px,13vw,82px);font-weight:800;text-shadow:0 3px 10px rgba(0,0,0,.18)}
+#pauseBtn{top:22px;right:18px;width:42px;height:42px;background:rgba(20,15,20,.18);border-color:rgba(255,255,255,.15);font-size:18px}
