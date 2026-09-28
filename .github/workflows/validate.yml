@@ -1,0 +1,22 @@
+name: Build and validate game
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate JavaScript syntax
+        run: node --check script.js
+      - name: Validate required files
+        run: |
+          test -f index.html
+          test -f style.css
+          test -f script.js
+          test -f design/app-icon/icon_1024_transparent.png
+          echo "Validation passed"
