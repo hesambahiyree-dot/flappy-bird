@@ -47,8 +47,8 @@ class Balloon {
     this.x = W * .25;
     this.y = H * .50;
     this.speed = 0;
-    this.w = 52;
-    this.h = 72;
+    this.w = 48;
+    this.h = 62;
     this.vy = 0;
   }
   update(dt){
@@ -68,7 +68,9 @@ class Pillar {
   constructor(x, gapY, gapHeight, speed){
     this.x = x; this.gapY = gapY; this.gapHeight = gapHeight;
     this.speed = speed; this.targetGapY = gapY; this.passed = false;
-    this.tapDirection = 1; this.selected = false;
+    // Tap moves continuously in one direction; direction changes only at an edge.
+    this.tapDirection = -1;
+    this.selected = false;
   }
   update(dt){
     this.x -= this.speed * dt;
@@ -76,9 +78,18 @@ class Pillar {
     this.gapY += diff * (1 - Math.exp(-12 * dt));
   }
   moveBy(amount){
-    const min = H*.20 + this.gapHeight/2;
-    const max = H*.80 - this.gapHeight/2;
-    this.targetGapY = Math.max(min, Math.min(max, this.targetGapY + amount));
+    const min = H*.08 + this.gapHeight/2;
+    const max = H*.92 - this.gapHeight/2;
+    const next = this.targetGapY + amount;
+    if(next <= min){
+      this.targetGapY = min;
+      this.tapDirection = 1;
+    }else if(next >= max){
+      this.targetGapY = max;
+      this.tapDirection = -1;
+    }else{
+      this.targetGapY = next;
+    }
   }
   getGap(){
     return {top:this.gapY-this.gapHeight/2,bottom:this.gapY+this.gapHeight/2};
@@ -161,9 +172,11 @@ function difficulty(){
 function addPillar(x){
   const d=difficulty();
   const gapH=H*(.255 - .075*d);
-  const min=H*.16+gapH/2, max=H*.84-gapH/2;
+  const min=H*.08+gapH/2, max=H*.92-gapH/2;
   const gapY=min+Math.random()*(max-min);
-  const speed=Math.min(330, W*(.48 + .24*d));
+  const speedSteps = Math.floor(state.score / 5);
+  const speedMultiplier = 1 + speedSteps * 0.10;
+  const speed=Math.min(430, W*(.44 + .18*d) * speedMultiplier);
   pillars.push(new Pillar(x,gapY,gapH,speed));
 }
 
@@ -180,8 +193,9 @@ function tapControl(){
   if(!state.running || state.paused || state.over) return;
   const p=getTargetPillar();
   if(!p) return;
+  // Each tap advances 20px in the current direction. Only reaching
+  // the top/bottom edge reverses the direction.
   p.moveBy(20*p.tapDirection);
-  p.tapDirection *= -1;
   beep(330,.045);
 }
 let touchY=0, touchMoved=false;
@@ -379,7 +393,9 @@ function drawPillarRect(x,y,w,h,capAtBottom){
 
 function drawBalloon(){
   const x=balloon.x,y=balloon.y;
-  const spriteW=Math.min(108,W*.30), spriteH=spriteW*(290/180);
+  const spriteW=Math.min(88,W*.245);
+  const naturalRatio = (balloonSprite.naturalHeight || 290) / (balloonSprite.naturalWidth || 180);
+  const spriteH = spriteW * naturalRatio;
   ctx.save();
   if(balloonSprite.complete && balloonSprite.naturalWidth){
     ctx.drawImage(balloonSprite,x-spriteW/2,y-spriteH*.43,spriteW,spriteH);
