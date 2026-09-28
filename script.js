@@ -160,10 +160,10 @@ function difficulty(){
 }
 function addPillar(x){
   const d=difficulty();
-  const gapH=H*(.29 - .065*d);
-  const min=H*.25+gapH/2, max=H*.73-gapH/2;
+  const gapH=H*(.255 - .075*d);
+  const min=H*.16+gapH/2, max=H*.84-gapH/2;
   const gapY=min+Math.random()*(max-min);
-  const speed=Math.min(240, W*(.34 + .12*d));
+  const speed=Math.min(330, W*(.48 + .24*d));
   pillars.push(new Pillar(x,gapY,gapH,speed));
 }
 
@@ -245,12 +245,11 @@ function rewardContinue(){
   if(!state.over) return;
   // Placeholder شبیه رفتار Rewarded Ad:
   state.over=false; state.running=true; state.shield=true;
-  state.wind=0; balloon.y=H*.5; balloon.vy=0;
+  balloon.y=H*.5; balloon.vy=0;
   show('game');
   state.last=performance.now();
   startAudio();
-  // ۵ ثانیه زمان اضافه:
-  state.elapsed=Math.max(0,state.elapsed-5);
+  // پاداش ادامه: یک سپر.
   requestAnimationFrame(loop);
 }
 
@@ -270,16 +269,8 @@ function update(dt){
   const d=difficulty();
   const speedBonus=1+d*.22;
 
-  // پنکه از امتیاز ۵:
-  if(state.score>=5){
-    const fanPhase=Math.floor(state.elapsed/4.5);
-    const active=(fanPhase%2===0);
-    const direction=(fanPhase%4<2)?-1:1;
-    const target=active ? direction*(0.42 + .12*Math.min(1,state.score/30)) : 0;
-    state.wind += (target-state.wind)*(1-Math.exp(-2.8*dt));
-  }else{
-    state.wind += (0-state.wind)*(1-Math.exp(-3*dt));
-  }
+  // بدون پنکه؛ بالن در محور عمودی ثابت می‌ماند.
+  state.wind = 0;
 
   balloon.update(dt);
 
@@ -337,8 +328,6 @@ function draw(){
   drawBackground();
   drawSun();
   drawPillars();
-  drawFans();
-  drawWind();
   drawParticles();
   drawBalloon();
 }
@@ -401,33 +390,6 @@ function drawBalloon(){
   }
   ctx.restore();
 }
-function drawFans(){
-  if(state.score<5)return;
-  const p=getTargetPillar(); if(!p)return;
-  const x=Math.min(W-48,p.x+p.width()+22), y=H*.72;
-  ctx.save(); ctx.translate(x,y);
-  ctx.fillStyle='#e8eef5'; ctx.beginPath(); ctx.arc(0,0,30,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#66717e';
-  for(let i=0;i<4;i++){ctx.save();ctx.rotate(i*Math.PI/2);ctx.beginPath();ctx.ellipse(0,-13,8,17,0,0,Math.PI*2);ctx.fill();ctx.restore();}
-  ctx.strokeStyle='#67d49a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,20);ctx.lineTo(0,100);ctx.stroke();
-  ctx.restore();
-}
-
-function drawWind(){
-  if(!windLines.length)return;
-  ctx.save();ctx.strokeStyle='rgba(170,225,255,.65)';ctx.lineWidth=2;
-  for(const l of windLines){
-    ctx.beginPath();
-    for(let j=0;j<34;j++){
-      const xx=l.x+j*4;
-      const yy=l.y+Math.sin(j*.35+l.phase)*4;
-      if(j===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
-    }
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
 function drawParticles(){
   for(const q of particles){
     ctx.globalAlpha=Math.max(0,q.life);
