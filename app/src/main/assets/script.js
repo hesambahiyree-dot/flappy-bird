@@ -11,9 +11,13 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const app = document.getElementById('app');
 const balloonSprite = new Image();
+const sunsetBg = new Image();
 let balloonRender = null;
+let sunsetBgReady = false;
 balloonSprite.onload = prepareBalloonSprite;
+sunsetBg.onload = () => { sunsetBgReady = true; };
 balloonSprite.src = 'assets/balloon-exact.png';
+sunsetBg.src = 'assets/sunset-game.jpg';
 
 function prepareBalloonSprite(){
   const c=document.createElement('canvas');
@@ -362,19 +366,18 @@ function draw(){
 }
 
 function drawBackground(){
+  if(sunsetBgReady && sunsetBg.naturalWidth){
+    const scale=Math.max(W/sunsetBg.naturalWidth,H/sunsetBg.naturalHeight);
+    const iw=sunsetBg.naturalWidth*scale, ih=sunsetBg.naturalHeight*scale;
+    ctx.drawImage(sunsetBg,(W-iw)/2,(H-ih)/2,iw,ih);
+    return;
+  }
   const g=ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,'#4A2C4A');
-  g.addColorStop(.38,'#693553');
-  g.addColorStop(.72,'#a24b4d');
+  g.addColorStop(.45,'#743852');
   g.addColorStop(1,'#D84315');
   ctx.fillStyle=g;
   ctx.fillRect(0,0,W,H);
-  // نرم‌افزار نور افق، مطابق قاب غروب مرجع
-  const haze=ctx.createLinearGradient(0,H*.58,0,H);
-  haze.addColorStop(0,'rgba(255,112,45,0)');
-  haze.addColorStop(1,'rgba(255,104,28,.10)');
-  ctx.fillStyle=haze;
-  ctx.fillRect(0,H*.55,W,H*.45);
 }
 
 function drawSun(){
