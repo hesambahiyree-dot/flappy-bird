@@ -78,8 +78,7 @@ public class GameView extends View {
         float floor = h * 0.86f;
         float gap = h * (first ? 0.34f : Math.max(0.21f, 0.34f - Math.min(score, 40) * 0.003f));
         float center = first ? h * 0.50f : ceiling + gap / 2f + random.nextFloat() * (floor - ceiling - gap);
-        float speed = 0.65f + Math.min(score, 35) * 0.018f;
-        gates.add(new Gate(x, center, gap, random.nextFloat() * 6.28f, speed));
+        gates.add(new Gate(x, center, gap));
     }
 
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
@@ -121,7 +120,7 @@ public class GameView extends View {
         float half = getWidth() * 0.045f;
         balloonY = Math.max(ceiling + half, Math.min(floor - half, balloonY));
 
-        boolean frozen = now < freezeUntil;
+        boolean frozen = false;
         for (Gate g : gates) {
             if (!frozen) {
                 g.phase += g.speed * dt / 1000f;
@@ -202,11 +201,13 @@ public class GameView extends View {
         fanForce = 0.00032f + random.nextFloat() * 0.00018f;
     }
 
-    private void tapAction() {
+    private void moveColumns(float deltaY) {
         if (!started || gameOver) return;
-        // Tap freezes moving gates briefly, giving the player control over timing.
-        freezeUntil = System.currentTimeMillis() + 1050;
-        if (fanActive) fanUntil = Math.min(fanUntil, System.currentTimeMillis() + 550);
+        float min = getHeight() * 0.25f;
+        float max = getHeight() * 0.75f;
+        for (Gate g : gates) {
+            g.centerY = Math.max(min, Math.min(max, g.centerY + deltaY));
+        }
         invalidate();
     }
 
@@ -292,28 +293,54 @@ public class GameView extends View {
 
         balloon.set(bx, balloonY - bh / 2f, bx + bw, balloonY + bh / 2f);
 
-        // Red / white arcade balloon.
-        p.setColor(0xFFE53935);
-        c.drawOval(balloon, p);
-
+        // Balloon artwork follows the supplied cream-head / basket / flame symbol.
+        p.setColor(0xFFF4E7C5);
+        c.drawRoundRect(bx + bw*0.08f, balloon.top, bx + bw*0.92f,
+                balloon.top + bh*0.62f, bw*0.28f, bw*0.28f, p);
+        p.setColor(0xFFD6C7A4);
+        c.drawOval(bx + bw*0.10f, balloon.top + bh*0.03f,
+                bx + bw*0.43f, balloon.top + bh*0.60f, p);
+        p.setColor(0xFF111111);
+        c.drawCircle(bx + bw*0.78f, balloon.top + bh*0.32f, bw*0.06f, p);
         p.setColor(Color.WHITE);
-        c.drawOval(
-                bx + bw * 0.24f, balloon.top + bh * 0.10f,
-                bx + bw * 0.50f, balloon.bottom - bh * 0.12f, p
-        );
+        c.drawCircle(bx + bw*0.80f, balloon.top + bh*0.30f, bw*0.018f, p);
 
-        p.setColor(0xFFB71C1C);
-        Path knot = new Path();
-        knot.moveTo(bx + bw * 0.43f, balloon.bottom - bh * 0.02f);
-        knot.lineTo(bx + bw * 0.57f, balloon.bottom - bh * 0.02f);
-        knot.lineTo(bx + bw * 0.50f, balloon.bottom + bh * 0.13f);
-        knot.close();
-        c.drawPath(knot, p);
+        p.setColor(0xFF5B3B3D);
+        Path frame = new Path();
+        frame.moveTo(bx+bw*0.30f, balloon.top+bh*0.57f);
+        frame.lineTo(bx+bw*0.41f, balloon.top+bh*0.50f);
+        frame.lineTo(bx+bw*0.59f, balloon.top+bh*0.50f);
+        frame.lineTo(bx+bw*0.70f, balloon.top+bh*0.57f);
+        frame.lineTo(bx+bw*0.65f, balloon.top+bh*0.64f);
+        frame.lineTo(bx+bw*0.35f, balloon.top+bh*0.64f);
+        frame.close();
+        c.drawPath(frame, p);
 
-        p.setColor(0xFF7A1010);
+        p.setColor(0xFF9B6669);
+        c.drawRoundRect(bx+bw*0.24f, balloon.top+bh*0.61f,
+                bx+bw*0.76f, balloon.top+bh*0.91f, bw*0.06f, bw*0.06f, p);
+        p.setColor(0xFF4B3034);
         p.setStrokeWidth(2f);
-        c.drawLine(bx + bw * 0.50f, balloon.bottom + bh * 0.13f,
-                bx + bw * 0.50f, balloon.bottom + bh * 0.38f, p);
+        for(int i=1;i<4;i++){
+            float xx=bx+bw*(0.24f+i*0.13f);
+            c.drawLine(xx, balloon.top+bh*0.62f, xx, balloon.top+bh*0.90f, p);
+        }
+        c.drawLine(bx+bw*0.25f, balloon.top+bh*0.77f,
+                bx+bw*0.75f, balloon.top+bh*0.77f, p);
+
+        p.setColor(0xFFFF5A32);
+        Path flame = new Path();
+        flame.moveTo(bx+bw*0.43f, balloon.bottom-bh*0.08f);
+        flame.cubicTo(bx+bw*0.34f, balloon.bottom+bh*0.08f,
+                bx+bw*0.49f, balloon.bottom+bh*0.10f,
+                bx+bw*0.50f, balloon.bottom+bh*0.18f);
+        flame.cubicTo(bx+bw*0.64f, balloon.bottom+bh*0.07f,
+                bx+bw*0.59f, balloon.bottom-bh*0.03f,
+                bx+bw*0.55f, balloon.bottom-bh*0.08f);
+        flame.close();
+        c.drawPath(flame, p);
+        p.setColor(0xFFFFE36E);
+        c.drawCircle(bx+bw*0.50f, balloon.bottom+bh*0.03f, bw*0.045f, p);
     }
 
     private void drawHud(Canvas c) {
@@ -329,7 +356,7 @@ public class GameView extends View {
         if (started && !gameOver) {
             p.setTextSize(getWidth() * 0.043f);
             p.setColor(0xFF36FF80);
-            c.drawText(System.currentTimeMillis() < freezeUntil ? "FROZEN • NICE TIMING" : "TAP TO STOP THE GATES",
+            c.drawText(System.currentTimeMillis() < freezeUntil ? "FROZEN • NICE TIMING" : "SWIPE ↑ ↓  •  MOVE THE GATES",
                     getWidth() / 2f, getHeight() * 0.21f, p);
 
             if (fanActive) {
@@ -349,12 +376,12 @@ public class GameView extends View {
 
             p.setColor(0xFFE53935);
             p.setTextSize(getWidth() * 0.052f);
-            c.drawText(gameOver ? "TAP TO PLAY AGAIN" : "TAP TO START",
+            c.drawText(gameOver ? "SWIPE TO PLAY AGAIN" : "SWIPE TO START",
                     getWidth() / 2f, getHeight() * 0.51f, p);
 
             p.setColor(0xCCFFFFFF);
             p.setTextSize(getWidth() * 0.041f);
-            c.drawText("Stop the moving gates at the right moment",
+            c.drawText("Drag the columns into the correct gap",
                     getWidth() / 2f, getHeight() * 0.59f, p);
             c.drawText("BEST  " + best, getWidth() / 2f, getHeight() * 0.67f, p);
         }
@@ -411,13 +438,24 @@ public class GameView extends View {
         }
     }
 
+    private float lastTouchY;
+    private boolean dragging;
+
     @Override public boolean onTouchEvent(MotionEvent e) {
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
-            if (!started || gameOver) {
-                startRun();
-            } else {
-                tapAction();
-            }
+            if (!started || gameOver) startRun();
+            dragging = true;
+            lastTouchY = e.getY();
+            return true;
+        }
+        if (e.getAction() == MotionEvent.ACTION_MOVE && dragging && started && !gameOver) {
+            float dy = e.getY() - lastTouchY;
+            if (Math.abs(dy) > 0.5f) moveColumns(dy);
+            lastTouchY = e.getY();
+            return true;
+        }
+        if (e.getAction() == MotionEvent.ACTION_UP) {
+            dragging = false;
             return true;
         }
         return true;
