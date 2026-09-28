@@ -11,7 +11,41 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const app = document.getElementById('app');
 const balloonSprite = new Image();
-balloonSprite.src = 'assets/balloon-reference.svg';
+let balloonRender = null;
+balloonSprite.onload = prepareBalloonSprite;
+balloonSprite.src = 'assets/balloon-exact.png';
+
+function prepareBalloonSprite(){
+  const c=document.createElement('canvas');
+  c.width=balloonSprite.naturalWidth; c.height=balloonSprite.naturalHeight;
+  const x=c.getContext('2d',{willReadFrequently:true});
+  x.drawImage(balloonSprite,0,0);
+  const im=x.getImageData(0,0,c.width,c.height), d=im.data;
+  const seen=new Uint8Array(c.width*c.height), q=[];
+  const seed=[[0,0],[c.width-1,0],[0,c.height-1],[c.width-1,c.height-1]];
+  const bg=[];
+  for(const [sx,sy] of seed){const i=(sy*c.width+sx)*4;bg.push([d[i],d[i+1],d[i+2]]);}
+  const avg=bg.reduce((a,v)=>[a[0]+v[0]/4,a[1]+v[1]/4,a[2]+v[2]/4],[0,0,0]);
+  const tol=48;
+  const ok=(i)=>{
+    const dr=d[i]-avg[0],dg=d[i+1]-avg[1],db=d[i+2]-avg[2];
+    return Math.sqrt(dr*dr+dg*dg+db*db)<tol;
+  };
+  for(const [sx,sy] of seed){
+    const si=sy*c.width+sx;if(seen[si])continue;
+    seen[si]=1;q.push(si);
+  }
+  while(q.length){
+    const p=q.pop(), px=p%c.width, py=(p/c.width)|0, i=p*4;
+    if(ok(i)) d[i+3]=0; else continue;
+    if(px>0){const n=p-1;if(!seen[n]){seen[n]=1;q.push(n)}}
+    if(px<c.width-1){const n=p+1;if(!seen[n]){seen[n]=1;q.push(n)}}
+    if(py>0){const n=p-c.width;if(!seen[n]){seen[n]=1;q.push(n)}}
+    if(py<c.height-1){const n=p+c.width;if(!seen[n]){seen[n]=1;q.push(n)}}
+  }
+  x.putImageData(im,0,0);
+  balloonRender=c;
+}
 
 const screens = {
   home: document.getElementById('home'),
@@ -158,7 +192,6 @@ function initGame(){
   balloon = new Balloon();
   pillars = [];
   particles = [];
-  windLines = [];
   state.score=0; state.elapsed=0; state.spawnTimer=.15; state.sunset=0; state.wind=0;
   state.over=false; state.shield=false;
   document.getElementById('score').textContent='0';
@@ -281,11 +314,7 @@ function update(dt){
   state.elapsed += dt;
   state.sunset = Math.min(1,state.elapsed/150);
   const d=difficulty();
-  const speedBonus=1+d*.22;
-
-  // بدون پنکه؛ بالن در محور عمودی ثابت می‌ماند.
   state.wind = 0;
-
   balloon.update(dt);
 
   state.spawnTimer-=dt;
@@ -311,24 +340,18 @@ function update(dt){
   }
 
   if(!state.shield){
-    for(const p of pillars){
-      if(p.collides(balloon)){ endGame(); return; }
-    }
+    for(const p of pillars) if(p.collides(balloon)){ endGame(); return; }
   }else{
-    // یک برخورد را نادیده بگیر و سپر را مصرف کن.
-    for(const p of pillars){
-      if(p.collides(balloon)){state.shield=false;break;}
-    }
+    for(const p of pillars) if(p.collides(balloon)){ state.shield=false; break; }
   }
 
-  if(state.sunset>=1){
-    endGame(); return;
-  }
+  if(state.sunset>=1){ endGame(); return; }
 
   for(const q of particles){
-    q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;
+    q.x+=q.vx*dt; q.y+=q.vy*dt; q.life-=dt;
   }
   particles=particles.filter(q=>q.life>0);
+}
 
 function draw(){
   drawBackground();
@@ -355,7 +378,6 @@ function drawBackground(){
 }
 
 function drawSun(){
-  const y=H*(.80 + state.sfunction drawSun(){
   const y=H*(.93 + state.sunset*.055);
   const r=Math.min(W*.36,H*.205);
   const grad=ctx.createRadialGradient(W*.5,y-r*.18,4,W*.5,y,r);
@@ -399,11 +421,11 @@ function drawPillarRect(x,y,w,h,capAtBottom){
 function drawBalloon(){
   const x=balloon.x,y=balloon.y;
   const spriteW=Math.min(76,W*.205);
-  const naturalRatio = (balloonSprite.naturalHeight || 290) / (balloonSprite.naturalWidth || 180);
+  const naturalRatio = (balloonSprite.naturalHeight || 290) / (balloonSprite.naturalWidth || 150);
   const spriteH = spriteW * naturalRatio;
   ctx.save();
-  if(balloonSprite.complete && balloonSprite.naturalWidth){
-    ctx.drawImage(balloonSprite,x-spriteW/2,y-spriteH*.43,spriteW,spriteH);
+  if(balloonRender){
+    ctx.drawImage(balloonRender,x-spriteW/2,y-spriteH*.43,spriteW,spriteH);
   }else{
     ctx.fillStyle='#E6D5B8';ctx.strokeStyle='#171313';ctx.lineWidth=4;
     ctx.beginPath();ctx.ellipse(x,y-14,30,39,0,0,Math.PI*2);ctx.fill();ctx.stroke();
