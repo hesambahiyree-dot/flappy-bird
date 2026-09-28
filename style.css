@@ -37,3 +37,5 @@
     .pauseCard h2{margin:0 0 15px}
     .topBack{position:absolute;top:18px;right:18px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.2);color:#fff;border-radius:12px;padding:9px 13px}
     @media (max-height:650px){.title{font-size:42px}.panel{padding:17px}.btn{padding:12px}.screen{padding:18px}}
+
+#gameUI{position:absolute;inset:0;pointer-events:none}#pauseBtn{pointer-events:auto}
