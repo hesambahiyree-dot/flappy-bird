@@ -20,6 +20,12 @@ jobs:
           java-version: '21'
       - run: npm install
       - run: npm run build
+      - name: Use JSON Capacitor config
+        run: |
+          rm -f capacitor.config.ts
+          cat > capacitor.config.json <<'EOF'
+          {"appId":"ir.baloon.sunset","appName":"بالن غروب","webDir":"dist"}
+          EOF
       - run: npx cap add android
       - run: npx cap sync android
       - name: Generate icon
