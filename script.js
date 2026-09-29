@@ -9,7 +9,7 @@ balloonImg.onload=()=>hasBalloon=true;
 
 let W=0,H=0,dpr=1,state="menu",last=0,score=0,paused=false,spawnTimer=0,difficulty=0,sensitivity=3,sound=true;
 let dragStartY=null,dragMoved=false;
-const balloon={x:.27,y:.50,r:34};
+const balloon={x:.225,y:.52,r:32};
 let pillars=[];
 
 function resize(){
@@ -36,13 +36,13 @@ function goMenu(){
 
 function addPillar(){
   // Difficulty increases only through the scrolling speed and smaller gaps.
-  const gapH=Math.max(H*.235,H*(.355-difficulty*.045));
+  const gapH=Math.max(H*.16,H*(.185-difficulty*.018));
   const margin=H*.075;
   const maxY=H-gapH-margin;
   const gapY=margin+Math.random()*Math.max(1,maxY-margin);
   pillars.push({
     x:W+72,
-    w:Math.max(58,W*.155),
+    w:Math.max(48,W*.095),
     gapY,gapH,
     scored:false,
     active:false,
@@ -128,18 +128,13 @@ function drawPillar(p){
   ctx.fillRect(p.x,p.gapY+p.gapH,p.w,H-p.gapY-p.gapH);
   ctx.strokeRect(p.x,p.gapY+p.gapH,p.w,H-p.gapY-p.gapH);
 
-  // Wide dark caps, matching the reference UI.
-  ctx.fillStyle="#6D432B";
-  ctx.fillRect(p.x-8,p.gapY-15,p.w+16,15);
-  ctx.strokeRect(p.x-8,p.gapY-15,p.w+16,15);
-  ctx.fillRect(p.x-8,p.gapY+p.gapH,p.w+16,15);
-  ctx.strokeRect(p.x-8,p.gapY+p.gapH,p.w+16,15);
+
 }
 
 function drawBalloon(){
   const x=balloon.x*W,y=balloon.y*H;
   if(hasBalloon){
-    const h=Math.min(H*.29,Math.max(150,W*.47));
+    const h=Math.min(H*.18,W*.15/.55);
     const w=h*.55;
     ctx.drawImage(balloonImg,x-w*.5,y-h*.42,w,h);
     return;
