@@ -1,7 +1,7 @@
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
 const menu=document.getElementById("menu"),hud=document.getElementById("hud"),over=document.getElementById("gameover"),settingsScreen=document.getElementById("settingsScreen"),helpScreen=document.getElementById("helpScreen"),pauseScreen=document.getElementById("pauseScreen");
 const scoreEl=document.getElementById("score"),finalEl=document.getElementById("finalScore"),sensitivityEl=document.getElementById("sensitivity"),soundToggle=document.getElementById("soundToggle");
-const balloonImg=new Image(); balloonImg.src="design/game-assets/balloon.webp"; let hasBalloon=false; balloonImg.onload=()=>hasBalloon=true;
+const balloonImg=new Image(); balloonImg.src="design/game-assets/balloon.svg"; let hasBalloon=false; balloonImg.onload=()=>hasBalloon=true;
 let W=0,H=0,dpr=1,state="menu",last=0,score=0,paused=false,spawnTimer=0,difficulty=0,sensitivity=3,sound=true;
 let dragStartY=null,dragMoved=false;
 const balloon={x:.27,y:.5,r:34}; let pillars=[];
