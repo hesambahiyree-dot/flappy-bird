@@ -1,0 +1,7 @@
+{
+  "appId": "com.example.balloonsunset",
+  "appName": "بالن غروب",
+  "webDir": "www",
+  "backgroundColor": "#2a1748",
+  "android": { "allowMixedContent": false }
+}
