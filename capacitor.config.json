@@ -1,7 +1,6 @@
 {
-  "appId": "com.example.balloonsunset",
-  "appName": "بالن غروب",
-  "webDir": "www",
-  "backgroundColor": "#2a1748",
-  "android": { "allowMixedContent": false }
+  "appId":"com.baloon.ghorob",
+  "appName":"بالن غروب",
+  "webDir":"www",
+  "android":{"backgroundColor":"#1d102b"}
 }
