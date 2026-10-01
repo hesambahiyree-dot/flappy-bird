@@ -1,6 +1,1 @@
-{
-  "appId":"com.baloon.ghorob",
-  "appName":"بالن غروب",
-  "webDir":"www",
-  "android":{"backgroundColor":"#1d102b"}
-}
+{"appId":"com.sunsetballoon.app","appName":"بالن غروب","webDir":"dist","android":{"backgroundColor":"#4A2C4A"},"plugins":{"SplashScreen":{"launchShowDuration":0,"backgroundColor":"#4A2C4A"}}}

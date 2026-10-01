@@ -1,0 +1,13 @@
+import type { Rect } from "./types";
+export class Balloon {
+  x:number;y:number;drawW=72;drawH=110;insetX=0.18;insetTop=0.1;insetBottom=0.3;rotation=0;vx=0;vy=0;vr=0;dying=false;image:HTMLImageElement|null=null;private imgReady=false;
+  constructor(x:number,y:number){this.x=x;this.y=y;const img=new Image();img.crossOrigin="anonymous";img.onload=()=>{this.imgReady=true;};img.src=`${import.meta.env.BASE_URL}assets/balloon.png`;this.image=img;}
+  layout(width:number,height:number):void { this.drawH=height*0.125;const aspect=this.image&&this.imgReady&&this.image.naturalWidth?this.image.naturalWidth/this.image.naturalHeight:405/730;this.drawW=this.drawH*aspect;if(!this.dying){this.x=width*0.22;this.y=height*0.42;} }
+  getBounds():Rect { const w=this.drawW*(1-this.insetX*2);const h=this.drawH*(1-this.insetTop-this.insetBottom);return {x:this.x-w/2,y:this.y-this.drawH/2+this.drawH*this.insetTop,w,h}; }
+  beginFall():void {this.dying=true;this.vy=-90;this.vx=-28;this.vr=2.6;}
+  reset(width:number,height:number):void {this.dying=false;this.rotation=0;this.vx=0;this.vy=0;this.vr=0;this.layout(width,height);}
+  update(dt:number):void {if(!this.dying)return;this.vy+=1600*dt;this.x+=this.vx*dt;this.y+=this.vy*dt;this.rotation+=this.vr*dt;}
+  draw(ctx:CanvasRenderingContext2D,flamePhase:number):void {ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);if(this.imgReady&&this.image)ctx.drawImage(this.image,-this.drawW/2,-this.drawH/2,this.drawW,this.drawH);else this.drawFallback(ctx);const glow=0.35+Math.sin(flamePhase*9)*0.12;ctx.globalCompositeOperation="lighter";ctx.fillStyle=`rgba(255,140,40,${glow})`;ctx.beginPath();ctx.ellipse(0,this.drawH*0.42,this.drawW*0.12,this.drawH*0.06,0,0,Math.PI*2);ctx.fill();ctx.restore();}
+  private drawFallback(ctx:CanvasRenderingContext2D):void {const w=this.drawW,h=this.drawH;ctx.lineJoin="round";ctx.lineWidth=Math.max(3,w*0.07);ctx.strokeStyle="#141414";ctx.fillStyle="#e6d7b8";roundRect(ctx,-w*0.38,-h*0.46,w*0.76,h*0.58,w*0.28);ctx.fill();ctx.stroke();ctx.fillStyle="#1a1a1a";ctx.beginPath();ctx.ellipse(w*0.16,-h*0.22,w*0.07,h*0.045,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#6b4a44";roundRect(ctx,-w*0.28,h*0.08,w*0.56,h*0.22,6);ctx.fill();ctx.stroke();ctx.fillStyle="#ff8a1a";ctx.beginPath();ctx.moveTo(-w*0.08,h*0.32);ctx.quadraticCurveTo(0,h*0.5,w*0.08,h*0.32);ctx.quadraticCurveTo(0,h*0.38,-w*0.08,h*0.32);ctx.fill();}
+}
+function roundRect(ctx:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,r:number):void {const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();}

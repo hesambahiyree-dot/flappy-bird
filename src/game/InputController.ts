@@ -1,0 +1,13 @@
+import { TAP_SLOP } from "./types";
+export type InputTarget = { screen: string; controlMode: string; hitActivePillar(x: number, y: number): boolean; nudgeActiveGap(deltaY: number): void; swipeActiveGap(deltaY: number): void; };
+type Drag = { id: number; lastY: number; total: number; onPillar: boolean };
+export class InputController {
+  private canvas: HTMLCanvasElement; private target: InputTarget; private drag: Drag | null = null; private unbind: (() => void) | null = null;
+  constructor(canvas: HTMLCanvasElement, target: InputTarget) { this.canvas = canvas; this.target = target; }
+  attach(): void { this.detach(); const down = (e: PointerEvent) => this.onDown(e); const move = (e: PointerEvent) => this.onMove(e); const up = (e: PointerEvent) => this.onUp(e); const cancel = (e: PointerEvent) => this.onUp(e); this.canvas.addEventListener("pointerdown", down); this.canvas.addEventListener("pointermove", move); this.canvas.addEventListener("pointerup", up); this.canvas.addEventListener("pointercancel", cancel); this.unbind = () => { this.canvas.removeEventListener("pointerdown", down); this.canvas.removeEventListener("pointermove", move); this.canvas.removeEventListener("pointerup", up); this.canvas.removeEventListener("pointercancel", cancel); }; }
+  detach(): void { this.unbind?.(); this.unbind = null; this.drag = null; }
+  private point(e: PointerEvent): { x: number; y: number } { const rect = this.canvas.getBoundingClientRect(); return { x: e.clientX - rect.left, y: e.clientY - rect.top }; }
+  private onDown(e: PointerEvent): void { if (this.target.screen !== "play") return; if (e.button !== 0 && e.pointerType === "mouse") return; e.preventDefault(); const { x, y } = this.point(e); const onPillar = this.target.hitActivePillar(x, y); this.drag = { id: e.pointerId, lastY: y, total: 0, onPillar }; try { this.canvas.setPointerCapture(e.pointerId); } catch {} }
+  private onMove(e: PointerEvent): void { if (!this.drag || e.pointerId !== this.drag.id || this.target.screen !== "play") return; const { y } = this.point(e); const dy = y - this.drag.lastY; this.drag.lastY = y; this.drag.total += dy; const mode = this.target.controlMode; if (this.drag.onPillar && (mode === "both" || mode === "swipe")) this.target.swipeActiveGap(dy); }
+  private onUp(e: PointerEvent): void { if (!this.drag || e.pointerId !== this.drag.id) return; const drag = this.drag; this.drag = null; try { this.canvas.releasePointerCapture(e.pointerId); } catch {} if (this.target.screen !== "play") return; const mode = this.target.controlMode; const isTap = Math.abs(drag.total) < TAP_SLOP; if (drag.onPillar && isTap && (mode === "both" || mode === "tap")) this.target.nudgeActiveGap(-20); }
+}

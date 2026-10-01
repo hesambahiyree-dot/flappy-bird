@@ -1,0 +1,9 @@
+export type Screen = "menu" | "settings" | "help" | "play" | "paused" | "gameover";
+export type ControlMode = "both" | "tap" | "swipe";
+export type Rect = { x: number; y: number; w: number; h: number };
+export type UiSnapshot = { screen: Screen; score: number; bestScore: number; soundEnabled: boolean; controlMode: ControlMode };
+export const TAP_NUDGE = 20;
+export const TAP_SLOP = 10;
+export const PHYSICS_STEP = 1 / 60;
+export const SAVE_KEY = "sunset-balloon-save";
+export const SAVE_VERSION = 1 as const;
